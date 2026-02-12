@@ -1,0 +1,91 @@
+# generated: 2026-02-13
+# project: archie-v2
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-02-13
+project: archie-v2
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1 : Inscription et acces securise
+  epic-1: in-progress
+  1-1-initialisation-du-monorepo: ready-for-dev
+  1-2-inscription-avec-consentement: backlog
+  1-3-connexion-et-gestion-de-session: backlog
+  1-4-profil-utilisateur-et-quota-de-stockage: backlog
+  1-5-suppression-de-compte: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2 : Depot et stockage securise de documents
+  epic-2: backlog
+  2-1-chiffrement-et-isolation-de-mes-documents: backlog
+  2-2-upload-unitaire-et-stockage-securise: backlog
+  2-3-upload-par-drag-drop-et-batch: backlog
+  2-4-generation-de-thumbnails: backlog
+  2-5-import-zip-structure: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3 : Classification intelligente et arborescence
+  epic-3: backlog
+  3-1-pipeline-extraction-de-texte-ocr: backlog
+  3-2-extraction-entites-et-generation-embeddings: backlog
+  3-3-classification-automatique-et-mode-degrade: backlog
+  3-4-arborescence-et-navigation: backlog
+  3-5-feedback-temps-reel-sse: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4 : Recherche en langage naturel
+  epic-4: backlog
+  4-1-moteur-de-recherche-hybride-backend: backlog
+  4-2-interface-de-recherche-et-resultats: backlog
+  4-3-visionneuse-de-document-complete: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5 : Gestion documentaire et apprentissage
+  epic-5: backlog
+  5-1-journalisation-des-acces-audit-trail: backlog
+  5-2-dashboard-documents-recents: backlog
+  5-3-deplacement-de-documents-et-apprentissage: backlog
+  5-4-selection-multiple-et-suppression: backlog
+  5-5-telechargement-et-export-de-donnees: backlog
+  5-6-droit-a-effacement-rgpd: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6 : Vitrine publique
+  epic-6: backlog
+  6-1-landing-page: backlog
+  6-2-cgu-et-politique-de-confidentialite: backlog
+  epic-6-retrospective: optional
