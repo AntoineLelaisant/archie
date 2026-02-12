@@ -1,6 +1,10 @@
 ---
-stepsCompleted: ['step-01-init', 'step-02-discovery', 'step-03-success', 'step-04-journeys', 'step-05-domain', 'step-06-innovation', 'step-07-project-type', 'step-08-scoping', 'step-09-functional', 'step-10-nonfunctional', 'step-11-polish']
+stepsCompleted: ['step-01-init', 'step-02-discovery', 'step-03-success', 'step-04-journeys', 'step-05-domain', 'step-06-innovation', 'step-07-project-type', 'step-08-scoping', 'step-09-functional', 'step-10-nonfunctional', 'step-11-polish', 'step-e-01-discovery', 'step-e-02-review', 'step-e-03-edit']
 inputDocuments: ['_bmad-output/brainstorming/brainstorming-session-2026-02-10.md', '_bmad-output/project-context.md']
+lastEdited: '2026-02-12'
+editHistory:
+  - date: '2026-02-12'
+    changes: 'Corrections mesurabilité (NFRs), fuites implémentation, ajout critères succès IA, formats HEIC/XLSX/DOCX, noms providers génériques'
 documentCounts:
   briefs: 0
   research: 0
@@ -62,6 +66,8 @@ date: '2026-02-11'
 - **Pipeline de traitement :** document uploadé → classé en < 20 secondes
 - **Classification :** ≥ 80% de précision sans intervention humaine
 - **Disponibilité :** mode dégradé fonctionnel quand Mistral/Tesseract est down (le document est stocké, le classement est différé)
+- **Apprentissage visible :** le taux de documents dans "À trier" décroît de 30% après 30 jours d'utilisation active
+- **Apprentissage implicite :** la précision de classification s'améliore de 10% après 20 corrections utilisateur
 - **Sécurité :** zéro fuite de documents — chiffrement at-rest, pipeline éphémère, zéro cross-learning
 
 ### Measurable Outcomes
@@ -73,6 +79,8 @@ date: '2026-02-11'
 | Précision classification | ≥ 80% | ≥ 90% |
 | Utilisateurs actifs (3 mois) | 50 | 200 |
 | Rétention hebdomadaire | 60% | 80% |
+| Taux "À trier" (décroissance à 30 jours) | -30% | -50% |
+| Précision post-corrections (après 20 corrections) | +10% | +20% |
 
 ## User Journeys
 
@@ -419,7 +427,7 @@ Archie est une web app SvelteKit avec SSR, derrière authentification. L'interfa
 - **FR7:** L'utilisateur peut déposer un document via sélecteur de fichier sur mobile
 - **FR8:** L'utilisateur peut prendre une photo de document avec la caméra mobile et la déposer
 - **FR9:** L'utilisateur peut déposer plusieurs documents en batch (upload simultané)
-- **FR10:** Le système accepte les formats PDF, JPG, PNG et WEBP
+- **FR10:** Le système accepte les formats PDF, JPG, PNG, WEBP, HEIC, XLSX et DOCX
 - **FR11:** Le système rejette les fichiers qui dépassent le quota de stockage de l'utilisateur
 
 ### Traitement IA (pipeline)
@@ -430,7 +438,7 @@ Archie est une web app SvelteKit avec SSR, derrière authentification. L'interfa
 - **FR15:** Le système classifie automatiquement chaque document dans l'arborescence
 - **FR16:** Le système oriente les documents à faible confiance de classification vers la file "À trier"
 - **FR17:** Le système chiffre le document après traitement
-- **FR18:** L'utilisateur reçoit un feedback en temps réel du classement (ex: "Classé dans Factures > EDF > 2025")
+- **FR18:** L'utilisateur reçoit un feedback du classement dans les 2 secondes suivant la fin du traitement (ex: "Classé dans Factures > EDF > 2025")
 - **FR19:** Le système génère un thumbnail de chaque document
 - **FR20:** Le système stocke le document et diffère le classement si le service IA est indisponible (mode dégradé)
 
@@ -454,17 +462,17 @@ Archie est une web app SvelteKit avec SSR, derrière authentification. L'interfa
 - **FR30:** Le système enregistre chaque déplacement comme signal d'apprentissage pour améliorer la classification future
 - **FR31:** L'utilisateur peut supprimer un ou plusieurs documents
 - **FR32:** L'utilisateur peut consulter les documents récemment déposés
-- **FR33:** L'utilisateur peut partager/exporter un document vers l'extérieur (téléchargement)
+- **FR33:** L'utilisateur peut télécharger un document pour le partager hors de l'application
 - **FR34:** L'utilisateur peut exporter l'ensemble de ses documents et métadonnées (portabilité)
 
 ### Confidentialité & conformité
 
 - **FR35:** Le système présente une demande de consentement explicite à l'inscription couvrant le traitement de tous types de documents, y compris les données de santé
-- **FR36:** L'utilisateur peut exercer son droit à l'effacement (suppression complète : document, métadonnées, embeddings, texte OCR)
+- **FR36:** L'utilisateur peut exercer son droit à l'effacement sous 30 jours maximum (suppression complète : document, métadonnées, embeddings, texte OCR, logs d'accès)
 - **FR37:** Le système chiffre les documents stockés at-rest
 - **FR38:** Le système ne conserve les documents en clair que pendant la durée du pipeline de traitement
 - **FR39:** Le système isole les données de chaque utilisateur (aucun accès croisé)
-- **FR40:** Le système journalise les accès aux documents (qui, quand, quelle action)
+- **FR40:** Le système journalise les accès aux documents (qui, quand, quelle action) avec une rétention de 12 mois maximum, supprimés lors de l'exercice du droit à l'effacement (FR36)
 
 ### Pages publiques
 
@@ -489,45 +497,45 @@ Archie est une web app SvelteKit avec SSR, derrière authentification. L'interfa
 
 - **NFR-S1:** Tous les documents stockés sont chiffrés at-rest (AES-256 minimum)
 - **NFR-S2:** Les communications sont chiffrées in-transit (HTTPS/TLS 1.3)
-- **NFR-S3:** Le document est en clair uniquement pendant le pipeline de traitement (fenêtre éphémère)
+- **NFR-S3:** Le document est en clair uniquement pendant le pipeline de traitement, avec une durée maximale de 60 secondes — en cas d'échec du pipeline, le document est automatiquement chiffré à l'expiration de ce délai
 - **NFR-S4:** Isolation complète des données entre utilisateurs — aucune requête ne peut accéder aux documents d'un autre utilisateur
-- **NFR-S5:** Seul le texte OCR est transmis à l'API Mistral, jamais le document original
+- **NFR-S5:** Seul le texte extrait est transmis au service LLM externe, jamais le document original
 - **NFR-S6:** Aucune donnée utilisateur n'alimente un modèle partagé (zéro cross-learning)
 - **NFR-S7:** Les sessions expirent après inactivité (durée configurable, défaut 24h)
 - **NFR-S8:** Les mots de passe sont hashés avec un algorithme résistant (bcrypt/argon2)
-- **NFR-S9:** Journalisation des accès aux documents (audit trail)
+- **NFR-S9:** Journalisation des accès aux documents (audit trail) : logs horodatés avec identité utilisateur, action et ressource, stockage en append-only, rétention 12 mois maximum
 
 ### Fiabilité & disponibilité
 
-- **NFR-R1:** Mode dégradé fonctionnel si Mistral est indisponible — le document est stocké, le classement est différé et repris automatiquement
-- **NFR-R2:** Mode dégradé fonctionnel si Tesseract est indisponible — même principe de reprise
+- **NFR-R1:** Mode dégradé fonctionnel si le service LLM est indisponible — le document est stocké, le classement est différé et repris automatiquement
+- **NFR-R2:** Mode dégradé fonctionnel si le service OCR est indisponible — même principe de reprise
 - **NFR-R3:** Aucun document ne peut être perdu suite à une erreur du pipeline — le fichier original est persisté avant tout traitement
 - **NFR-R4:** Les jobs en échec dans la queue sont retentés automatiquement (3 tentatives avec backoff exponentiel)
-- **NFR-R5:** Backups chiffrés des données (fréquence à définir)
+- **NFR-R5:** Backups chiffrés des données avec une fréquence quotidienne (RPO 24h maximum)
 
 ### Scalabilité
 
-- **NFR-SC1:** Le système supporte 50 utilisateurs actifs simultanés au lancement MVP
-- **NFR-SC2:** Le système supporte 200 utilisateurs actifs sans refonte architecturale (stretch goal 3 mois)
+- **NFR-SC1:** Le système supporte 50 utilisateurs actifs simultanés (≥ 1 requête HTTP dans une fenêtre glissante de 60 secondes) au lancement MVP
+- **NFR-SC2:** Le système supporte 200 utilisateurs actifs simultanés (même définition que NFR-SC1) avec la même architecture MVP (stretch goal 3 mois)
 - **NFR-SC3:** Le pipeline de traitement supporte le traitement parallèle d'au moins 10 documents simultanément
-- **NFR-SC4:** Le stockage supporte 2 Go × nombre d'utilisateurs sans dégradation
+- **NFR-SC4:** Le stockage supporte 2 Go × nombre d'utilisateurs sans dégradation des temps d'accès (lecture document < 500ms, upload batch 20 fichiers < 5s)
 
 ### Accessibilité
 
-- **NFR-A1:** Conformité WCAG 2.1 niveau AA
+- **NFR-A1:** Conformité WCAG 2.1 niveau AA sur les parcours principaux (inscription, login, upload, recherche, navigation arborescence, preview, suppression)
 - **NFR-A2:** Navigation clavier complète sur toutes les fonctionnalités
 - **NFR-A3:** Contraste de couleurs ≥ 4.5:1 (texte normal) et ≥ 3:1 (grands textes)
 - **NFR-A4:** Labels ARIA sur tous les composants interactifs
 
 ### Intégrations externes
 
-- **NFR-I1:** L'intégration Mistral doit être abstraite derrière une interface (changement de fournisseur LLM sans impact sur le reste du système)
-- **NFR-I2:** L'intégration OCR doit être abstraite derrière une interface (Tesseract remplaçable)
+- **NFR-I1:** Le service de classification utilise une interface abstraite pour le fournisseur LLM, testable par le remplacement du fournisseur sans modification des couches application et stockage
+- **NFR-I2:** Le service d'extraction de texte utilise une interface abstraite pour le fournisseur OCR, testable par le remplacement du fournisseur sans modification des couches application et stockage
 - **NFR-I3:** Timeout configurable sur les appels API externes (défaut 30s)
-- **NFR-I4:** Circuit breaker sur les appels Mistral pour éviter les cascades d'échecs
+- **NFR-I4:** Circuit breaker sur les appels au service LLM pour éviter les cascades d'échecs
 
 ### Infrastructure
 
 - **NFR-INF1:** Hébergement 100% français (Scaleway) — aucune donnée hors UE
 - **NFR-INF2:** Déploiement conteneurisé en développement et en production
-- **NFR-INF3:** Monitoring des coûts par utilisateur (Mistral API, stockage Scaleway)
+- **NFR-INF3:** Monitoring des coûts par utilisateur (API LLM, API OCR, stockage) avec tableau de bord affichant coût total et coût moyen par utilisateur actif, mis à jour quotidiennement
