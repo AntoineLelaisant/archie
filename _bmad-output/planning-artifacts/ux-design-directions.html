@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archie — Design Directions (v2)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-900: #111827;
+    --indigo-50: #eef2ff;
+    --indigo-100: #e0e7ff;
+    --indigo-500: #6366f1;
+    --indigo-600: #4f46e5;
+    --emerald-50: #ecfdf5;
+    --emerald-600: #059669;
+    --amber-50: #fffbeb;
+    --amber-500: #f59e0b;
+    --amber-600: #d97706;
+    --red-50: #fef2f2;
+    --red-600: #dc2626;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    line-height: 1.5;
+  }
+
+  /* Lucide-style icons as inline SVG */
+  .icon-svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; flex-shrink: 0; }
+  .icon-svg-lg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; flex-shrink: 0; }
+  .icon-svg-xl { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; flex-shrink: 0; }
+  .icon-svg-hero { width: 48px; height: 48px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+
+  /* Navigation */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 16px;
+    overflow-x: auto;
+  }
+  .nav h1 { font-size: 16px; font-weight: 600; color: var(--indigo-500); white-space: nowrap; }
+  .nav-btn {
+    padding: 8px 16px; border-radius: 8px; border: 1px solid var(--gray-200);
+    background: var(--white); cursor: pointer; font-size: 13px; font-family: inherit;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  .nav-btn:hover { border-color: var(--indigo-500); color: var(--indigo-500); }
+  .nav-btn.active { background: var(--indigo-500); color: white; border-color: var(--indigo-500); }
+
+  /* Sections */
+  .section { display: none; padding: 80px 24px 24px; min-height: 100vh; }
+  .section.active { display: block; }
+  .section-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .section-desc { font-size: 14px; color: var(--gray-500); margin-bottom: 24px; }
+
+  /* Frames */
+  .desktop-frame {
+    width: 100%; max-width: 960px; background: var(--white);
+    border-radius: 12px; border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+  .mockup-label {
+    padding: 12px 16px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
+    font-size: 13px; font-weight: 500; color: var(--gray-600);
+  }
+  .phone-frame {
+    width: 375px; height: 750px; background: var(--white);
+    border-radius: 12px; border: 1px solid var(--gray-200);
+    overflow: hidden; flex-shrink: 0; position: relative;
+  }
+  .compare { display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap; }
+  .compare > * { flex: 1; min-width: 340px; }
+
+  /* Search bar */
+  .search-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; border-radius: 10px;
+    border: 1px solid var(--gray-200); background: var(--gray-50);
+    font-size: 14px; color: var(--gray-400);
+  }
+  .search-bar:focus-within { border-color: var(--indigo-500); background: var(--white); }
+  .search-bar .mic { margin-left: auto; color: var(--indigo-500); cursor: pointer; display: flex; }
+
+  /* Buttons */
+  .btn-primary {
+    padding: 10px 20px; background: var(--indigo-500); color: white;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--indigo-600); }
+  .btn-ghost {
+    padding: 8px 12px; background: transparent; color: var(--gray-600);
+    border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px;
+    font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-modify {
+    padding: 4px 10px; background: transparent; color: var(--indigo-500);
+    border: 1px solid var(--indigo-500); border-radius: 6px; font-size: 11px;
+    font-family: inherit; cursor: pointer; font-weight: 500; white-space: nowrap;
+  }
+  .btn-modify:hover { background: var(--indigo-50); }
+  .fab {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: var(--indigo-500); color: white; border: none;
+    font-size: 24px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  /* Badges */
+  .badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+  .badge-amber { background: var(--amber-50); color: var(--amber-600); }
+  .badge-emerald { background: var(--emerald-50); color: var(--emerald-600); }
+  .badge-indigo { background: var(--indigo-50); color: var(--indigo-500); }
+
+  /* Toast */
+  .toast {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 10px;
+    background: var(--emerald-50); border: 1px solid #a7f3d0;
+    font-size: 13px;
+  }
+  .toast .toast-action {
+    margin-left: auto; color: var(--indigo-500); font-weight: 500;
+    cursor: pointer; font-size: 13px; white-space: nowrap;
+  }
+
+  /* Grid cards (primary display mode) */
+  .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+  .doc-grid-card {
+    border-radius: 10px; border: 1px solid var(--gray-200); background: var(--white);
+    overflow: hidden; cursor: pointer; transition: all 0.15s;
+  }
+  .doc-grid-card:hover { border-color: var(--indigo-500); box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1); }
+  .doc-grid-thumb {
+    width: 100%; height: 140px; background: var(--gray-50);
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid var(--gray-200); position: relative;
+  }
+  .doc-grid-thumb .doc-preview {
+    width: 85%; height: 85%; background: white; border: 1px solid var(--gray-300);
+    border-radius: 2px; display: flex; align-items: flex-start; padding: 8px;
+    font-size: 7px; color: var(--gray-400); line-height: 1.4;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .doc-grid-info { padding: 12px; }
+  .doc-grid-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-grid-meta { font-size: 11px; color: var(--gray-500); }
+  .doc-grid-path { font-size: 11px; color: var(--indigo-500); margin-top: 4px; display: flex; align-items: center; gap: 2px; }
+  .doc-grid-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+
+  /* Folder grid cards */
+  .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .folder-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px; border-radius: 10px; border: 1px solid var(--gray-200);
+    background: var(--white); cursor: pointer; transition: all 0.15s;
+  }
+  .folder-card:hover { border-color: var(--indigo-500); background: var(--indigo-50); }
+  .folder-card .folder-icon { color: var(--gray-400); display: flex; }
+  .folder-card .folder-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .folder-card .folder-count { font-size: 11px; color: var(--gray-400); }
+
+  /* À trier link */
+  .a-trier-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 8px;
+    background: var(--amber-50); border: 1px solid #fde68a;
+    font-size: 13px; font-weight: 500; color: var(--amber-600);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .a-trier-link:hover { background: #fef3c7; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--gray-200); }
+  .tab {
+    padding: 10px 16px; font-size: 13px; font-weight: 500;
+    color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+  }
+  .tab:hover { color: var(--gray-900); }
+  .tab.active { color: var(--indigo-500); border-bottom-color: var(--indigo-500); }
+
+  /* Status bar (phone) */
+  .status-bar {
+    height: 44px; padding: 0 16px; display: flex; align-items: center;
+    justify-content: space-between; font-size: 12px; font-weight: 600;
+  }
+
+  /* Notes */
+  .note {
+    padding: 16px; background: var(--indigo-50); border-radius: 8px;
+    border-left: 3px solid var(--indigo-500); font-size: 13px;
+    color: var(--gray-600); margin-bottom: 24px; line-height: 1.6;
+  }
+  .note strong { color: var(--gray-900); }
+
+  /* Breadcrumb */
+  .breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 13px; }
+  .breadcrumb a { color: var(--indigo-500); text-decoration: none; cursor: pointer; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--gray-400); display: flex; }
+
+  /* Section header */
+  .content-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .content-header h3 { font-size: 16px; font-weight: 600; }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <h1>Archie</h1>
+  <button class="nav-btn active" onclick="show('dashboard')">Dashboard</button>
+  <button class="nav-btn" onclick="show('search')">Recherche</button>
+  <button class="nav-btn" onclick="show('tree')">Arborescence</button>
+  <button class="nav-btn" onclick="show('toast')">Feedback</button>
+  <button class="nav-btn" onclick="show('viewer')">Visionneuse</button>
+  <button class="nav-btn" onclick="show('onboarding')">Onboarding</button>
+  <button class="nav-btn" onclick="show('mobile')">Mobile</button>
+  <button class="nav-btn" onclick="show('scanner')">Scanner</button>
+</nav>
+
+<!-- SVG icon definitions (Lucide-style) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="icon-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+  <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+  <symbol id="icon-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="icon-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+  <symbol id="icon-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></symbol>
+  <symbol id="icon-move" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 9l-3 3 3 3M19 9l3 3-3 3M9 5l3-3 3 3M9 19l3 3 3-3"/></symbol>
+  <symbol id="icon-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="icon-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></symbol>
+  <symbol id="icon-alert-triangle" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="icon-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol>
+  <symbol id="icon-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 10 10-12h-9l1-10z"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+  <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></symbol>
+  <symbol id="icon-archive" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></symbol>
+  <symbol id="icon-pencil" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></symbol>
+  <symbol id="icon-grip" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+  <symbol id="icon-zoom-in" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></symbol>
+  <symbol id="icon-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+  <symbol id="icon-wifi" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></symbol>
+  <symbol id="icon-battery" viewBox="0 0 24 24"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+</svg>
+
+
+<!-- =============================== DASHBOARD =============================== -->
+<section id="dashboard" class="section active">
+  <h2 class="section-title">Dashboard — Vue principale</h2>
+  <p class="section-desc">Pas de sidebar. Contenu principal : recherche en haut, documents recents en grid, puis dossiers. Modele Google Drive.</p>
+
+  <div class="note">
+    <strong>Changements cles :</strong> Suppression de la sidebar. L'arborescence est le corps de la page. Affichage exclusivement en grid/cards. Bouton "Modifier" uniquement sur les documents recents. Labels "Classe" / "A trier" sur chaque carte recente.
+  </div>
+
+  <div class="mockup-label">Desktop — Dashboard (pleine largeur)</div>
+  <div class="desktop-frame" style="min-height: 600px;">
+    <!-- Top bar -->
+    <div style="padding: 16px 32px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-size: 20px; font-weight: 600; color: var(--indigo-500);">Archie</div>
+      <div class="a-trier-link">
+        <svg class="icon-svg"><use href="#icon-inbox"/></svg>
+        A trier
+        <span style="background: var(--amber-500); color: white; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600;">5</span>
+      </div>
+    </div>
+
+    <div style="max-width: 720px; margin: 0 auto; padding: 32px;">
+      <!-- Search bar -->
+      <div class="search-bar" style="margin-bottom: 32px; padding: 12px 20px; font-size: 15px;">
+        <svg class="icon-svg-lg" style="color: var(--gray-400);"><use href="#icon-search"/></svg>
+        <span>Rechercher un document...</span>
+        <span class="mic">
+          <svg class="icon-svg-lg"><use href="#icon-mic"/></svg>
+        </span>
+      </div>
+
+      <!-- Documents recents -->
+      <div class="content-header">
+        <h3>Documents recents</h3>
+        <span style="font-size: 13px; color: var(--gray-500);">Aujourd'hui</span>
+      </div>
+      <div class="doc-grid" style="margin-bottom: 40px;">
+        <!-- Card 1 — Classe -->
+        <div class="doc-grid-card">
+          <div class="doc-grid-thumb">
+            <div class="doc-preview">
+              EDF<br>Facture Fevrier 2026<br>Ref: 0826...<br>Montant: 127,43 EUR
+            </div>
+          </div>
+          <div class="doc-grid-info">
+            <div class="doc-grid-title">Facture EDF Fev. 2026</div>
+            <div class="doc-grid-meta">12 fev. 2026 — 2 pages</div>
+            <div class="doc-grid-path">
+              <svg class="icon-svg" style="width:12px;height:12px;"><use href="#icon-folder"/></svg>
+              Energie › EDF › 2026
+            </div>
+            <div class="doc-grid-footer">
+              <span class="badge badge-emerald">Classe</span>
+              <button class="btn-modify">Modifier</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 — Classe -->
+        <div class="doc-grid-card">
+          <div class="doc-grid-thumb">
+            <div class="doc-preview">
+              MAIF<br>Attestation<br>Assurance<br>Habitation 2026
+            </div>
+          </div>
+          <div class="doc-grid-info">
+            <div class="doc-grid-title">Attestation assurance hab.</div>
+            <div class="doc-grid-meta">11 fev. 2026 — 1 page</div>
+            <div class="doc-grid-path">
+              <svg class="icon-svg" style="width:12px;height:12px;"><use href="#icon-folder"/></svg>
+              Assurance › Habitation
+            </div>
+            <div class="doc-grid-footer">
+              <span class="badge badge-emerald">Classe</span>
+              <button class="btn-modify">Modifier</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 — A trier -->
+        <div class="doc-grid-card">
+          <div class="doc-grid-thumb">
+            <div class="doc-preview" style="border-color: var(--amber-500);">
+              CAF<br>Courrier<br>Allocation<br>Rentree...
+            </div>
+          </div>
+          <div class="doc-grid-info">
+            <div class="doc-grid-title">Courrier CAF allocation</div>
+            <div class="doc-grid-meta">10 fev. 2026 — 1 page</div>
+            <div class="doc-grid-footer">
+              <span class="badge badge-amber">A trier</span>
+              <button class="btn-modify">Modifier</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 — Classe -->
+        <div class="doc-grid-card">
+          <div class="doc-grid-thumb">
+            <div class="doc-preview">
+              Credit Mutuel<br>Releve de compte<br>Janvier 2026<br>...
+            </div>
+          </div>
+          <div class="doc-grid-info">
+            <div class="doc-grid-title">Releve bancaire Jan. 2026</div>
+            <div class="doc-grid-meta">10 fev. 2026 — 4 pages</div>
+            <div class="doc-grid-path">
+              <svg class="icon-svg" style="width:12px;height:12px;"><use href="#icon-folder"/></svg>
+              Banque › CM › 2026
+            </div>
+            <div class="doc-grid-footer">
+              <span class="badge badge-emerald">Classe</span>
+              <button class="btn-modify">Modifier</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dossiers -->
+      <div class="content-header">
+        <h3>Mes dossiers</h3>
+        <span style="font-size: 13px; color: var(--gray-400);">247 documents</span>
+      </div>
+      <div class="folder-grid">
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">Energie</span>
+          <span class="folder-count">34</span>
+        </div>
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">Banque</span>
+          <span class="folder-count">52</span>
+        </div>
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">Assurance</span>
+          <span class="folder-count">28</span>
+        </div>
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">Sante</span>
+          <span class="folder-count">41</span>
+        </div>
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">Enfants</span>
+          <span class="folder-count">23</span>
+        </div>
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">Logement</span>
+          <span class="folder-count">19</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================== SEARCH =============================== -->
+<section id="search" class="section">
+  <h2 class="section-title">Resultats de recherche</h2>
+  <p class="section-desc">Affichage exclusivement en grid/cards. Preview visuelle dominante. Breadcrumb sur chaque carte. Pas de bouton "Modifier".</p>
+
+  <div class="note">
+    <strong>Principe cle :</strong> La recherche est l'interaction reine. Resultat en &lt; 1 seconde. Chaque card montre une preview visuelle dominante + titre + breadcrumb du classement + date. L'utilisateur reconnait visuellement le bon document.
+  </div>
+
+  <div class="mockup-label">Desktop — Resultats en grille</div>
+  <div class="desktop-frame" style="padding: 32px; max-width: 960px;">
+    <div class="search-bar" style="margin-bottom: 8px; border-color: var(--indigo-500); background: var(--white); max-width: 720px; margin-left: auto; margin-right: auto;">
+      <svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-search"/></svg>
+      <span style="color: var(--gray-900); flex: 1;">attestation assurance</span>
+      <span style="font-size: 12px; color: var(--gray-400); cursor: pointer; display: flex;">
+        <svg class="icon-svg" style="color: var(--gray-400);"><use href="#icon-x"/></svg>
+      </span>
+    </div>
+    <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 20px; max-width: 720px; margin-left: auto; margin-right: auto;">3 resultats — 0.4s</div>
+
+    <div class="doc-grid" style="max-width: 720px; margin: 0 auto;">
+      <div class="doc-grid-card" style="border-color: var(--indigo-500);">
+        <div class="doc-grid-thumb" style="height: 160px;">
+          <div class="doc-preview" style="height: 90%;">
+            MAIF<br><br>Attestation<br>Assurance<br>Habitation<br>2026<br><br>N° contrat: ...
+          </div>
+        </div>
+        <div class="doc-grid-info">
+          <div class="doc-grid-title">Attestation assurance habitation 2026</div>
+          <div class="doc-grid-meta">MAIF — 15 jan. 2026 — 1 page</div>
+          <div class="doc-grid-path">
+            <svg class="icon-svg" style="width:12px;height:12px;"><use href="#icon-folder"/></svg>
+            Assurance › Habitation › MAIF
+          </div>
+        </div>
+      </div>
+      <div class="doc-grid-card">
+        <div class="doc-grid-thumb" style="height: 160px;">
+          <div class="doc-preview" style="height: 90%;">
+            MAIF<br><br>Attestation<br>Assurance<br>Habitation<br>2025
+          </div>
+        </div>
+        <div class="doc-grid-info">
+          <div class="doc-grid-title">Attestation assurance habitation 2025</div>
+          <div class="doc-grid-meta">MAIF — 12 jan. 2025 — 1 page</div>
+          <div class="doc-grid-path">
+            <svg class="icon-svg" style="width:12px;height:12px;"><use href="#icon-folder"/></svg>
+            Assurance › Habitation › MAIF
+          </div>
+        </div>
+      </div>
+      <div class="doc-grid-card">
+        <div class="doc-grid-thumb" style="height: 160px;">
+          <div class="doc-preview" style="height: 90%;">
+            MAIF<br><br>Contrat<br>Multirisque<br>Habitation
+          </div>
+        </div>
+        <div class="doc-grid-info">
+          <div class="doc-grid-title">Contrat multirisque habitation</div>
+          <div class="doc-grid-meta">MAIF — 3 mars 2024 — 8 pages</div>
+          <div class="doc-grid-path">
+            <svg class="icon-svg" style="width:12px;height:12px;"><use href="#icon-folder"/></svg>
+            Assurance › Habitation › MAIF
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================== TREE =============================== -->
+<section id="tree" class="section">
+  <h2 class="section-title">Navigation arborescence</h2>
+  <p class="section-desc">Corps de la page (pas de sidebar). Breadcrumb en haut. Documents et sous-dossiers en grille. Drag & drop, selection multiple.</p>
+
+  <div class="note">
+    <strong>Interactions :</strong> Drag & drop pour deplacer fichiers et dossiers. Ctrl+C / Ctrl+V pour copier-coller. Selection multiple pour actions de masse. Pas de bouton "Modifier" ici — la correction se fait par deplacement.
+  </div>
+
+  <div class="mockup-label">Desktop — Dossier Energie › EDF</div>
+  <div class="desktop-frame" style="min-height: 480px;">
+    <!-- Top bar -->
+    <div style="padding: 16px 32px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-size: 20px; font-weight: 600; color: var(--indigo-500);">Archie</div>
+      <div class="a-trier-link">
+        <svg class="icon-svg"><use href="#icon-inbox"/></svg>
+        A trier
+        <span style="background: var(--amber-500); color: white; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600;">5</span>
+      </div>
+    </div>
+
+    <div style="max-width: 720px; margin: 0 auto; padding: 32px;">
+      <!-- Search bar -->
+      <div class="search-bar" style="margin-bottom: 24px;">
+        <svg class="icon-svg-lg" style="color: var(--gray-400);"><use href="#icon-search"/></svg>
+        <span>Rechercher dans EDF...</span>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb" style="margin-bottom: 24px;">
+        <a>Mes documents</a>
+        <span class="sep"><svg class="icon-svg" style="width:14px;height:14px;"><use href="#icon-chevron-right"/></svg></span>
+        <a>Energie</a>
+        <span class="sep"><svg class="icon-svg" style="width:14px;height:14px;"><use href="#icon-chevron-right"/></svg></span>
+        <span style="font-weight: 500;">EDF</span>
+        <span style="margin-left: auto; font-size: 12px; color: var(--gray-400);">18 documents</span>
+      </div>
+
+      <!-- Sous-dossiers -->
+      <div class="folder-grid" style="margin-bottom: 24px;">
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">2026</span>
+          <span class="folder-count">4</span>
+        </div>
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">2025</span>
+          <span class="folder-count">12</span>
+        </div>
+        <div class="folder-card">
+          <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+          <span class="folder-name">Contrats</span>
+          <span class="folder-count">2</span>
+        </div>
+      </div>
+
+      <!-- Documents en grid -->
+      <div class="content-header">
+        <h3>Documents</h3>
+      </div>
+      <div class="doc-grid">
+        <div class="doc-grid-card">
+          <div class="doc-grid-thumb">
+            <div class="doc-preview">EDF<br>Facture<br>Fevrier 2026<br>127,43 EUR</div>
+          </div>
+          <div class="doc-grid-info">
+            <div class="doc-grid-title">Facture EDF Fev. 2026</div>
+            <div class="doc-grid-meta">12 fev. 2026 — 2 pages</div>
+          </div>
+        </div>
+        <div class="doc-grid-card">
+          <div class="doc-grid-thumb">
+            <div class="doc-preview">EDF<br>Facture<br>Janvier 2026<br>118,92 EUR</div>
+          </div>
+          <div class="doc-grid-info">
+            <div class="doc-grid-title">Facture EDF Jan. 2026</div>
+            <div class="doc-grid-meta">15 jan. 2026 — 2 pages</div>
+          </div>
+        </div>
+        <div class="doc-grid-card">
+          <div class="doc-grid-thumb">
+            <div class="doc-preview">EDF<br>Echeancier<br>2025-2026</div>
+          </div>
+          <div class="doc-grid-info">
+            <div class="doc-grid-title">Echeancier 2025-2026</div>
+            <div class="doc-grid-meta">1 oct. 2025 — 1 page</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================== TOAST =============================== -->
+<section id="toast" class="section">
+  <h2 class="section-title">Feedback de classement</h2>
+  <p class="section-desc">Toast temporaire apres classification. Discret, factuel, avec bouton "Deplacer" pour correction immediate.</p>
+
+  <div class="note">
+    <strong>Principe cle :</strong> Le feedback est silencieux et jamais intrusif. Un toast suffit. Pas de modale, pas de celebration. Le ton est factuel.
+  </div>
+
+  <div class="compare">
+    <div>
+      <div class="mockup-label">Toast — Classement reussi</div>
+      <div style="padding: 24px; background: var(--gray-50); border-radius: 12px;">
+        <div class="toast" style="margin-bottom: 12px;">
+          <svg class="icon-svg-lg" style="color: var(--emerald-600);"><use href="#icon-check-circle"/></svg>
+          <div>
+            <div style="font-weight: 500;">Classe dans Energie › EDF › 2026</div>
+            <div style="font-size: 12px; color: var(--gray-500);">Facture EDF Fevrier 2026</div>
+          </div>
+          <span class="toast-action">Deplacer</span>
+        </div>
+
+        <div class="toast" style="background: var(--amber-50); border-color: #fde68a;">
+          <svg class="icon-svg-lg" style="color: var(--amber-500);"><use href="#icon-alert-triangle"/></svg>
+          <div>
+            <div style="font-weight: 500;">Ajoute dans A trier</div>
+            <div style="font-size: 12px; color: var(--gray-500);">Courrier CAF — confiance insuffisante</div>
+          </div>
+          <span class="toast-action">Classer</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-label">Toast — Erreur d'upload</div>
+      <div style="padding: 24px; background: var(--gray-50); border-radius: 12px;">
+        <div class="toast" style="background: var(--red-50); border-color: #fecaca;">
+          <svg class="icon-svg-lg" style="color: var(--red-600);"><use href="#icon-x-circle"/></svg>
+          <div>
+            <div style="font-weight: 500;">Echec de l'upload</div>
+            <div style="font-size: 12px; color: var(--gray-500);">document.pdf — format non supporte</div>
+          </div>
+          <span class="toast-action" style="color: var(--red-600);">Reessayer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 32px;">
+    <div class="mockup-label">Pipeline en cours — Indicateur discret dans le dashboard</div>
+    <div style="padding: 24px; background: var(--gray-50); border-radius: 12px; max-width: 500px;">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; background: var(--white); border: 1px solid var(--gray-200);">
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--indigo-500); animation: pulse 1.5s infinite;"></div>
+        <div style="flex: 1;">
+          <div style="font-size: 13px; font-weight: 500;">3 documents en cours de traitement...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================== VIEWER =============================== -->
+<section id="viewer" class="section">
+  <h2 class="section-title">Visionneuse de document</h2>
+  <p class="section-desc">PDF viewer in-app. Pas de rupture de contexte. Boutons Partager, Telecharger, Deplacer.</p>
+
+  <div class="desktop-frame" style="height: 540px; display: flex; flex-direction: column;">
+    <div style="padding: 12px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--gray-200);">
+      <svg class="icon-svg-lg" style="cursor: pointer; color: var(--gray-600);"><use href="#icon-arrow-left"/></svg>
+      <div style="flex: 1;">
+        <div style="font-size: 15px; font-weight: 600;">Attestation assurance habitation 2026</div>
+        <div style="font-size: 12px; color: var(--gray-500);">MAIF — Assurance › Habitation › MAIF — 15 jan. 2026</div>
+      </div>
+      <button class="btn-ghost"><svg class="icon-svg"><use href="#icon-share"/></svg> Partager</button>
+      <button class="btn-ghost"><svg class="icon-svg"><use href="#icon-download"/></svg> Telecharger</button>
+      <button class="btn-ghost"><svg class="icon-svg"><use href="#icon-move"/></svg> Deplacer</button>
+    </div>
+    <div style="flex: 1; background: var(--gray-100); display: flex; align-items: center; justify-content: center;">
+      <div style="width: 400px; height: 380px; background: white; border: 1px solid var(--gray-300); border-radius: 2px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;">
+        <svg class="icon-svg-hero" style="color: var(--gray-300);"><use href="#icon-file-text"/></svg>
+        <div style="font-size: 14px; color: var(--gray-400);">Attestation assurance habitation</div>
+        <div style="font-size: 12px; color: var(--gray-400);">PDF — 1 page</div>
+      </div>
+    </div>
+    <div style="padding: 8px 16px; border-top: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; gap: 16px; font-size: 13px; color: var(--gray-500);">
+      <span>Page 1 / 1</span>
+      <span>|</span>
+      <span style="cursor: pointer; display: flex; align-items: center; gap: 4px;">
+        <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-zoom-in"/></svg> Zoom
+      </span>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================== ONBOARDING =============================== -->
+<section id="onboarding" class="section">
+  <h2 class="section-title">Onboarding</h2>
+  <p class="section-desc">Premier contact : message de souverainete + zone de depot. Sobre, clair, un seul objectif.</p>
+
+  <div class="compare">
+    <div>
+      <div class="mockup-label">Ecran de bienvenue — Premier upload</div>
+      <div class="desktop-frame" style="padding: 64px 48px; text-align: center;">
+        <div style="font-size: 28px; font-weight: 600; margin-bottom: 8px;">Bienvenue dans Archie</div>
+        <div style="font-size: 16px; color: var(--gray-500); margin-bottom: 32px;">Deposez vos documents, Archie s'occupe du reste.</div>
+
+        <div style="max-width: 480px; margin: 0 auto 32px; padding: 16px; background: var(--indigo-50); border-radius: 10px; border: 1px solid var(--indigo-100); text-align: left;">
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <svg class="icon-svg-xl" style="color: var(--indigo-500); flex-shrink: 0; margin-top: 2px;"><use href="#icon-shield"/></svg>
+            <div>
+              <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">Vos documents sont en securite</div>
+              <div style="font-size: 13px; color: var(--gray-600);">Heberges en France, chiffres, et ne quittent jamais l'Europe. Aucune donnee n'est partagee avec des tiers.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="max-width: 480px; margin: 0 auto; padding: 48px; border: 2px dashed var(--gray-300); border-radius: 12px; background: var(--gray-50); cursor: pointer; transition: all 0.15s;" onmouseover="this.style.borderColor='var(--indigo-500)'; this.style.background='var(--indigo-50)'" onmouseout="this.style.borderColor='var(--gray-300)'; this.style.background='var(--gray-50)'">
+          <svg class="icon-svg-hero" style="color: var(--gray-400); margin-bottom: 12px;"><use href="#icon-upload"/></svg>
+          <div style="font-size: 16px; font-weight: 500; margin-bottom: 4px;">Deposez vos documents ici</div>
+          <div style="font-size: 13px; color: var(--gray-500);">PDF, images, ZIP — ou cliquez pour selectionner</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-label">Import ZIP — Choix de structure</div>
+      <div class="desktop-frame" style="padding: 48px; text-align: center;">
+        <svg class="icon-svg-hero" style="color: var(--indigo-500); margin-bottom: 16px;"><use href="#icon-archive"/></svg>
+        <div style="font-size: 20px; font-weight: 600; margin-bottom: 4px;">Archive detectee</div>
+        <div style="font-size: 14px; color: var(--gray-500); margin-bottom: 32px;">documents-administratifs.zip — 47 fichiers, 12 dossiers</div>
+
+        <div style="max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;">
+          <div style="padding: 20px; border: 2px solid var(--gray-200); border-radius: 10px; cursor: pointer; text-align: left; transition: all 0.15s;" onmouseover="this.style.borderColor='var(--indigo-500)'" onmouseout="this.style.borderColor='var(--gray-200)'">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; margin-bottom: 4px;">
+              <svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg>
+              Conserver la structure
+            </div>
+            <div style="font-size: 13px; color: var(--gray-500); padding-left: 28px;">Les dossiers de l'archive deviennent vos dossiers dans Archie.</div>
+          </div>
+          <div style="padding: 20px; border: 2px solid var(--gray-200); border-radius: 10px; cursor: pointer; text-align: left; transition: all 0.15s;" onmouseover="this.style.borderColor='var(--indigo-500)'" onmouseout="this.style.borderColor='var(--gray-200)'">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; margin-bottom: 4px;">
+              <svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-zap"/></svg>
+              Optimiser la structure
+            </div>
+            <div style="font-size: 13px; color: var(--gray-500); padding-left: 28px;">Archie utilise la structure comme indice et peut reorganiser pour un meilleur classement.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================== MOBILE =============================== -->
+<section id="mobile" class="section">
+  <h2 class="section-title">App Mobile</h2>
+  <p class="section-desc">Experience React Native. Grid/cards partout. Tabs Recents/Dossiers/A trier. Bouton "Modifier" uniquement sur l'onglet Recents.</p>
+
+  <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+    <!-- Mobile Dashboard -->
+    <div>
+      <div class="mockup-label">Dashboard mobile — Onglet Recents</div>
+      <div class="phone-frame">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span style="display: flex; gap: 6px;">
+            <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-wifi"/></svg>
+            <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-battery"/></svg>
+          </span>
+        </div>
+        <div style="padding: 0 16px;">
+          <div style="font-size: 22px; font-weight: 600; margin-bottom: 16px; color: var(--indigo-500);">Archie</div>
+          <div class="search-bar" style="margin-bottom: 20px;">
+            <svg class="icon-svg" style="color: var(--gray-400);"><use href="#icon-search"/></svg>
+            <span>Rechercher un document...</span>
+            <span class="mic"><svg class="icon-svg" style="color: var(--indigo-500);"><use href="#icon-mic"/></svg></span>
+          </div>
+
+          <div class="tabs" style="margin: 0 -16px; padding: 0 16px;">
+            <div class="tab active">Recents</div>
+            <div class="tab">Dossiers</div>
+            <div class="tab">A trier <span class="badge badge-amber" style="margin-left: 4px;">5</span></div>
+          </div>
+
+          <div style="padding-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <!-- Mobile card 1 -->
+            <div class="doc-grid-card">
+              <div class="doc-grid-thumb" style="height: 100px;">
+                <div class="doc-preview" style="font-size: 6px;">EDF<br>Facture<br>Fev. 2026</div>
+              </div>
+              <div class="doc-grid-info" style="padding: 8px;">
+                <div class="doc-grid-title" style="font-size: 12px;">Facture EDF Fev.</div>
+                <div class="doc-grid-meta" style="font-size: 10px;">Energie › EDF</div>
+                <div class="doc-grid-footer" style="margin-top: 6px;">
+                  <span class="badge badge-emerald" style="font-size: 9px; padding: 1px 6px;">Classe</span>
+                  <button class="btn-modify" style="font-size: 9px; padding: 2px 6px;">Modifier</button>
+                </div>
+              </div>
+            </div>
+            <!-- Mobile card 2 -->
+            <div class="doc-grid-card">
+              <div class="doc-grid-thumb" style="height: 100px;">
+                <div class="doc-preview" style="font-size: 6px;">MAIF<br>Attestation<br>Assurance</div>
+              </div>
+              <div class="doc-grid-info" style="padding: 8px;">
+                <div class="doc-grid-title" style="font-size: 12px;">Attestation assur.</div>
+                <div class="doc-grid-meta" style="font-size: 10px;">Assurance › Hab.</div>
+                <div class="doc-grid-footer" style="margin-top: 6px;">
+                  <span class="badge badge-emerald" style="font-size: 9px; padding: 1px 6px;">Classe</span>
+                  <button class="btn-modify" style="font-size: 9px; padding: 2px 6px;">Modifier</button>
+                </div>
+              </div>
+            </div>
+            <!-- Mobile card 3 — A trier -->
+            <div class="doc-grid-card">
+              <div class="doc-grid-thumb" style="height: 100px;">
+                <div class="doc-preview" style="font-size: 6px; border-color: var(--amber-500);">CAF<br>Courrier<br>Allocation</div>
+              </div>
+              <div class="doc-grid-info" style="padding: 8px;">
+                <div class="doc-grid-title" style="font-size: 12px;">Courrier CAF</div>
+                <div class="doc-grid-footer" style="margin-top: 6px;">
+                  <span class="badge badge-amber" style="font-size: 9px; padding: 1px 6px;">A trier</span>
+                  <button class="btn-modify" style="font-size: 9px; padding: 2px 6px;">Modifier</button>
+                </div>
+              </div>
+            </div>
+            <!-- Mobile card 4 -->
+            <div class="doc-grid-card">
+              <div class="doc-grid-thumb" style="height: 100px;">
+                <div class="doc-preview" style="font-size: 6px;">Credit Mutuel<br>Releve<br>Jan. 2026</div>
+              </div>
+              <div class="doc-grid-info" style="padding: 8px;">
+                <div class="doc-grid-title" style="font-size: 12px;">Releve bancaire</div>
+                <div class="doc-grid-meta" style="font-size: 10px;">Banque › CM</div>
+                <div class="doc-grid-footer" style="margin-top: 6px;">
+                  <span class="badge badge-emerald" style="font-size: 9px; padding: 1px 6px;">Classe</span>
+                  <button class="btn-modify" style="font-size: 9px; padding: 2px 6px;">Modifier</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- FAB -->
+        <div style="position: absolute; bottom: 24px; right: 24px;">
+          <button class="fab">
+            <svg class="icon-svg-xl" style="color: white;"><use href="#icon-plus"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dossiers -->
+    <div>
+      <div class="mockup-label">Mobile — Onglet Dossiers</div>
+      <div class="phone-frame">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span style="display: flex; gap: 6px;">
+            <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-wifi"/></svg>
+            <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-battery"/></svg>
+          </span>
+        </div>
+        <div style="padding: 0 16px;">
+          <div style="font-size: 22px; font-weight: 600; margin-bottom: 16px; color: var(--indigo-500);">Archie</div>
+          <div class="search-bar" style="margin-bottom: 20px;">
+            <svg class="icon-svg" style="color: var(--gray-400);"><use href="#icon-search"/></svg>
+            <span>Rechercher un document...</span>
+            <span class="mic"><svg class="icon-svg" style="color: var(--indigo-500);"><use href="#icon-mic"/></svg></span>
+          </div>
+
+          <div class="tabs" style="margin: 0 -16px; padding: 0 16px;">
+            <div class="tab">Recents</div>
+            <div class="tab active">Dossiers</div>
+            <div class="tab">A trier <span class="badge badge-amber" style="margin-left: 4px;">5</span></div>
+          </div>
+
+          <div style="padding-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+            <div class="folder-card">
+              <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+              <span class="folder-name">Energie</span>
+              <span class="folder-count">34</span>
+              <svg class="icon-svg" style="color: var(--gray-300);"><use href="#icon-chevron-right"/></svg>
+            </div>
+            <div class="folder-card">
+              <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+              <span class="folder-name">Banque</span>
+              <span class="folder-count">52</span>
+              <svg class="icon-svg" style="color: var(--gray-300);"><use href="#icon-chevron-right"/></svg>
+            </div>
+            <div class="folder-card">
+              <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+              <span class="folder-name">Assurance</span>
+              <span class="folder-count">28</span>
+              <svg class="icon-svg" style="color: var(--gray-300);"><use href="#icon-chevron-right"/></svg>
+            </div>
+            <div class="folder-card">
+              <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+              <span class="folder-name">Sante</span>
+              <span class="folder-count">41</span>
+              <svg class="icon-svg" style="color: var(--gray-300);"><use href="#icon-chevron-right"/></svg>
+            </div>
+            <div class="folder-card">
+              <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+              <span class="folder-name">Enfants</span>
+              <span class="folder-count">23</span>
+              <svg class="icon-svg" style="color: var(--gray-300);"><use href="#icon-chevron-right"/></svg>
+            </div>
+            <div class="folder-card">
+              <span class="folder-icon"><svg class="icon-svg-lg" style="color: var(--indigo-500);"><use href="#icon-folder"/></svg></span>
+              <span class="folder-name">Logement</span>
+              <span class="folder-count">19</span>
+              <svg class="icon-svg" style="color: var(--gray-300);"><use href="#icon-chevron-right"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style="position: absolute; bottom: 24px; right: 24px;">
+          <button class="fab">
+            <svg class="icon-svg-xl" style="color: white;"><use href="#icon-plus"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Search Results -->
+    <div>
+      <div class="mockup-label">Resultats de recherche mobile</div>
+      <div class="phone-frame">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span style="display: flex; gap: 6px;">
+            <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-wifi"/></svg>
+            <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-battery"/></svg>
+          </span>
+        </div>
+        <div style="padding: 0 16px;">
+          <div class="search-bar" style="margin-bottom: 4px; border-color: var(--indigo-500); background: white;">
+            <svg class="icon-svg" style="color: var(--gray-600); cursor: pointer;"><use href="#icon-arrow-left"/></svg>
+            <span style="color: var(--gray-900); flex: 1;">attestation assurance</span>
+            <svg class="icon-svg" style="color: var(--gray-400); cursor: pointer;"><use href="#icon-x"/></svg>
+          </div>
+          <div style="font-size: 11px; color: var(--gray-500); margin-bottom: 12px;">2 resultats — 0.4s</div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="doc-grid-card">
+              <div class="doc-grid-thumb" style="height: 120px;">
+                <div class="doc-preview" style="font-size: 6px;">MAIF<br>Attestation<br>Assurance<br>Habitation<br>2026</div>
+              </div>
+              <div class="doc-grid-info" style="padding: 8px;">
+                <div class="doc-grid-title" style="font-size: 12px;">Attestation hab. 2026</div>
+                <div class="doc-grid-meta" style="font-size: 10px;">MAIF — 15 jan. 2026</div>
+                <div class="doc-grid-path" style="font-size: 10px; margin-top: 4px;">
+                  <svg class="icon-svg" style="width:10px;height:10px;"><use href="#icon-folder"/></svg>
+                  Assurance › Hab.
+                </div>
+              </div>
+            </div>
+            <div class="doc-grid-card">
+              <div class="doc-grid-thumb" style="height: 120px;">
+                <div class="doc-preview" style="font-size: 6px;">MAIF<br>Attestation<br>Assurance<br>Habitation<br>2025</div>
+              </div>
+              <div class="doc-grid-info" style="padding: 8px;">
+                <div class="doc-grid-title" style="font-size: 12px;">Attestation hab. 2025</div>
+                <div class="doc-grid-meta" style="font-size: 10px;">MAIF — 12 jan. 2025</div>
+                <div class="doc-grid-path" style="font-size: 10px; margin-top: 4px;">
+                  <svg class="icon-svg" style="width:10px;height:10px;"><use href="#icon-folder"/></svg>
+                  Assurance › Hab.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================== SCANNER =============================== -->
+<section id="scanner" class="section">
+  <h2 class="section-title">Scanner mobile</h2>
+  <p class="section-desc">Experience de scan multi-pages integree au flux de depot. Reordonnancement des pages par drag & drop.</p>
+
+  <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+    <div>
+      <div class="mockup-label">Capture en cours</div>
+      <div class="phone-frame" style="background: #1a1a1a;">
+        <div class="status-bar" style="color: white;">
+          <span>9:41</span>
+          <span style="display: flex; gap: 6px;">
+            <svg class="icon-svg" style="width: 14px; height: 14px; color: white;"><use href="#icon-wifi"/></svg>
+            <svg class="icon-svg" style="width: 14px; height: 14px; color: white;"><use href="#icon-battery"/></svg>
+          </span>
+        </div>
+        <div style="padding: 8px 16px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: white; cursor: pointer; font-size: 14px;">Annuler</span>
+          <span style="color: white; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+            <svg class="icon-svg" style="color: white;"><use href="#icon-camera"/></svg> Scanner
+          </span>
+          <span style="visibility: hidden;">OK</span>
+        </div>
+        <!-- Camera view -->
+        <div style="height: 420px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; position: relative;">
+          <div style="width: 260px; height: 340px; border: 2px solid var(--indigo-500); border-radius: 4px; background: rgba(99, 102, 241, 0.05);"></div>
+          <div style="position: absolute; bottom: 16px; left: 16px; right: 16px; display: flex; justify-content: center;">
+            <div style="padding: 6px 12px; background: rgba(0,0,0,0.6); border-radius: 6px; font-size: 12px; color: white;">
+              Alignez le document dans le cadre
+            </div>
+          </div>
+        </div>
+        <!-- Controls -->
+        <div style="padding: 24px; display: flex; align-items: center; justify-content: space-around;">
+          <div style="width: 44px; height: 44px; border-radius: 8px; background: #333; display: flex; align-items: center; justify-content: center;">
+            <svg class="icon-svg-lg" style="color: white;"><use href="#icon-zap"/></svg>
+          </div>
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: white; border: 3px solid var(--gray-400); cursor: pointer;"></div>
+          <div style="width: 44px; height: 44px; border-radius: 8px; background: #333; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white;">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-label">Multi-pages — 2 pages capturees</div>
+      <div class="phone-frame" style="background: #1a1a1a;">
+        <div class="status-bar" style="color: white;">
+          <span>9:41</span>
+          <span style="display: flex; gap: 6px;">
+            <svg class="icon-svg" style="width: 14px; height: 14px; color: white;"><use href="#icon-wifi"/></svg>
+            <svg class="icon-svg" style="width: 14px; height: 14px; color: white;"><use href="#icon-battery"/></svg>
+          </span>
+        </div>
+        <div style="padding: 8px 16px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: white; cursor: pointer; font-size: 14px;">Annuler</span>
+          <span style="color: white; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+            <svg class="icon-svg" style="color: white;"><use href="#icon-camera"/></svg> Scanner
+          </span>
+          <span style="color: var(--indigo-500); font-size: 14px; font-weight: 500; cursor: pointer;">Terminer</span>
+        </div>
+        <div style="height: 420px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; position: relative;">
+          <div style="width: 260px; height: 340px; border: 2px solid var(--indigo-500); border-radius: 4px; background: rgba(99, 102, 241, 0.05);"></div>
+        </div>
+        <div style="padding: 24px; display: flex; align-items: center; justify-content: space-around;">
+          <div style="width: 44px; height: 44px; border-radius: 8px; background: #333; display: flex; align-items: center; justify-content: center;">
+            <svg class="icon-svg-lg" style="color: white;"><use href="#icon-zap"/></svg>
+          </div>
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: white; border: 3px solid var(--gray-400); cursor: pointer;"></div>
+          <div style="width: 44px; height: 44px; border-radius: 8px; background: var(--indigo-500); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: white; cursor: pointer;">2</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-label">Confirmation — Reordonner et deposer</div>
+      <div class="phone-frame">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span style="display: flex; gap: 6px;">
+            <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-wifi"/></svg>
+            <svg class="icon-svg" style="width: 14px; height: 14px;"><use href="#icon-battery"/></svg>
+          </span>
+        </div>
+        <div style="padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-200);">
+          <span style="cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 4px;">
+            <svg class="icon-svg"><use href="#icon-arrow-left"/></svg> Retour
+          </span>
+          <span style="font-size: 14px; font-weight: 500;">2 pages</span>
+          <span style="visibility: hidden;">---</span>
+        </div>
+        <div style="padding: 24px 16px;">
+          <div style="display: flex; gap: 12px; margin-bottom: 16px; justify-content: center;">
+            <!-- Page 1 with grip handle -->
+            <div style="position: relative;">
+              <div style="position: absolute; top: 4px; left: 4px; background: rgba(255,255,255,0.9); border-radius: 4px; padding: 2px;">
+                <svg class="icon-svg" style="color: var(--gray-400); width: 14px; height: 14px;"><use href="#icon-grip"/></svg>
+              </div>
+              <div style="width: 130px; height: 170px; background: var(--gray-100); border: 2px solid var(--indigo-500); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px;">
+                <svg class="icon-svg-lg" style="color: var(--gray-400);"><use href="#icon-file-text"/></svg>
+                <span style="font-size: 11px; color: var(--gray-500);">Page 1</span>
+              </div>
+            </div>
+            <!-- Page 2 with grip handle -->
+            <div style="position: relative;">
+              <div style="position: absolute; top: 4px; left: 4px; background: rgba(255,255,255,0.9); border-radius: 4px; padding: 2px;">
+                <svg class="icon-svg" style="color: var(--gray-400); width: 14px; height: 14px;"><use href="#icon-grip"/></svg>
+              </div>
+              <div style="width: 130px; height: 170px; background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px;">
+                <svg class="icon-svg-lg" style="color: var(--gray-400);"><use href="#icon-file-text"/></svg>
+                <span style="font-size: 11px; color: var(--gray-500);">Page 2</span>
+              </div>
+            </div>
+          </div>
+          <div style="text-align: center; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <svg class="icon-svg" style="color: var(--gray-400); width: 14px; height: 14px;"><use href="#icon-grip"/></svg>
+            <span style="font-size: 13px; color: var(--gray-500);">Faites glisser pour reordonner</span>
+          </div>
+          <button class="btn-primary" style="width: 100%; padding: 14px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg class="icon-svg-lg" style="color: white;"><use href="#icon-upload"/></svg>
+            Deposer le document
+          </button>
+          <button class="btn-ghost" style="width: 100%; margin-top: 8px; justify-content: center; display: flex; align-items: center; gap: 6px;">
+            <svg class="icon-svg"><use href="#icon-plus"/></svg>
+            Ajouter une page
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+
+</body>
+</html>
