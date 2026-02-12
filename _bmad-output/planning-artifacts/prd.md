@@ -308,7 +308,7 @@ Archie est une web app SvelteKit avec SSR, derrière authentification. L'interfa
 
 ### Responsive Design
 
-- **Mobile-first** : scan mobile et recherche en déplacement sont des use cases primaires
+- **Responsive desktop-first** : le POC Web cible l'onboarding batch desktop, le mobile web est pleinement fonctionnel en attendant l'app native
 - **Breakpoints** : mobile (< 768px), tablet (768-1024px), desktop (> 1024px)
 - **Touch-friendly** : cibles tactiles ≥ 44px, gestes de swipe pour la navigation mobile
 - **Scan mobile** : accès caméra via l'API web standard (pas d'app native)
@@ -429,6 +429,7 @@ Archie est une web app SvelteKit avec SSR, derrière authentification. L'interfa
 - **FR9:** L'utilisateur peut déposer plusieurs documents en batch (upload simultané)
 - **FR10:** Le système accepte les formats PDF, JPG, PNG, WEBP, HEIC, XLSX et DOCX
 - **FR11:** Le système rejette les fichiers qui dépassent le quota de stockage de l'utilisateur
+- **FR43:** L'utilisateur peut déposer un fichier ZIP contenant des documents organisés en dossiers, avec le choix de conserver la structure existante ou de laisser l'IA optimiser le classement
 
 ### Traitement IA (pipeline)
 

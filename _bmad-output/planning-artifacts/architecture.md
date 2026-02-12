@@ -29,7 +29,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 | Groupe | FRs | Implication architecturale |
 |---|---|---|
 | Gestion de compte | FR1-FR5 | Module Auth (inscription, session, profil, suppression complète, quota) |
-| Dépôt de documents | FR6-FR11 | Module Ingestion (multi-canal : drag & drop, file input, caméra, batch, ZIP structuré). Formats : PDF, JPG, PNG, WEBP, HEIC, XLSX, DOCX. Validation quota. |
+| Dépôt de documents | FR6-FR11, FR43 | Module Ingestion (multi-canal : drag & drop, file input, caméra, batch, ZIP structuré). Formats : PDF, JPG, PNG, WEBP, HEIC, XLSX, DOCX. Validation quota. Import ZIP avec choix de traitement de la structure. |
 | Traitement IA (pipeline) | FR12-FR20 | Module Pipeline orchestrant 5 étapes séquentielles pluggables : extraction texte → extraction entités → génération embedding → classification → chiffrement. Feedback SSE. Mode dégradé. Thumbnail. |
 | Organisation & navigation | FR21-FR24 | Module Classification (arborescence auto-générée, stable entre visites, file "À trier") |
 | Recherche | FR25-FR28 | Module Search (hybride full-text + sémantique + métadonnées, résultats < 1s, preview inline) |
@@ -38,7 +38,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 
 **Non-Functional Requirements:**
 
-25 NFRs en 7 catégories, dont les plus structurants pour l'architecture :
+36 NFRs en 7 catégories, dont les plus structurants pour l'architecture :
 
 | Catégorie | NFRs clés | Impact architectural |
 |---|---|---|
