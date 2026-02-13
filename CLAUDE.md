@@ -119,4 +119,4 @@ docker compose up # Demarrer PostgreSQL + Redis
 - Contexte projet (regles IA) : `_bmad-output/project-context.md`
 - Epics & Stories : `_bmad-output/planning-artifacts/epics.md`
 - Statut du sprint : `_bmad-output/implementation-artifacts/sprint-status.yaml`
-- Story en cours : `_bmad-output/implementation-artifacts/1-1-initialisation-du-monorepo.md`
+- Story en cours : `_bmad-output/implementation-artifacts/1-2-inscription-avec-consentement.md`
