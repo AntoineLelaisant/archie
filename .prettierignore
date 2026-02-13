@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.svelte-kit/
+.turbo/
+coverage/
+$houdini/
+pnpm-lock.yaml
+_bmad-output/

@@ -42,7 +42,7 @@ story_location: _bmad-output/implementation-artifacts
 development_status:
   # Epic 1 : Inscription et acces securise
   epic-1: in-progress
-  1-1-initialisation-du-monorepo: ready-for-dev
+  1-1-initialisation-du-monorepo: done
   1-2-inscription-avec-consentement: ready-for-dev
   1-3-connexion-et-gestion-de-session: backlog
   1-4-profil-utilisateur-et-quota-de-stockage: backlog

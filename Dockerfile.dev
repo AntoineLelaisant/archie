@@ -1,0 +1,16 @@
+FROM node:lts-alpine AS base
+RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
+WORKDIR /app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+COPY docker-entrypoint.dev.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.dev.sh
+ENTRYPOINT ["docker-entrypoint.dev.sh"]
+
+FROM base AS api
+EXPOSE 3000
+CMD ["pnpm", "--filter", "@archie/api", "dev"]
+
+FROM base AS web
+EXPOSE 5173
+CMD ["pnpm", "--filter", "@archie/web", "dev"]

@@ -1,0 +1,49 @@
+{
+  "name": "archie",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "eslint .",
+    "type-check": "turbo type-check",
+    "depcruise": "depcruise apps/api/src --config .dependency-cruiser.cjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "dependency-cruiser": "^17.3.8",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-svelte": "^3.15.0",
+    "globals": "^17.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "prettier-plugin-svelte": "^3.4.1",
+    "turbo": "^2.8.7",
+    "typescript-eslint": "^8.55.0"
+  },
+  "lint-staged": {
+    "*.{ts,svelte}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css,html}": [
+      "prettier --write"
+    ]
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@apollo/protobufjs",
+      "@nestjs/core",
+      "@swc/core",
+      "esbuild",
+      "msgpackr-extract"
+    ]
+  }
+}
