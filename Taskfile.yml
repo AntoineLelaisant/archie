@@ -1,0 +1,92 @@
+version: '3'
+
+dotenv:
+  - .env.local
+  - .env
+
+vars:
+  CERT_DIR: .certs
+  CERT_DOMAIN: app.localhost
+
+tasks:
+  default:
+    desc: Setup complet depuis zéro
+    cmds:
+      - task: check-tools
+      - task: install
+      - task: certs
+      - task: up
+
+  check-tools:
+    desc: Vérifie les outils requis
+    silent: true
+    cmds:
+      - command -v docker >/dev/null || { echo "❌ docker manquant"; exit 1; }
+      - command -v pnpm >/dev/null || { echo "❌ pnpm manquant"; exit 1; }
+      - command -v mkcert >/dev/null || { echo "❌ mkcert manquant (brew install mkcert)"; exit 1; }
+
+  install:
+    desc: Installer les dépendances pnpm
+    sources:
+      - pnpm-lock.yaml
+      - package.json
+      - apps/*/package.json
+      - packages/*/package.json
+    cmds:
+      - pnpm install --frozen-lockfile
+
+  certs:
+    desc: Générer les certificats mkcert pour *.app.localhost
+    status:
+      - test -f {{.CERT_DIR}}/{{.CERT_DOMAIN}}+1.pem
+    cmds:
+      - mkcert -install
+      - mkdir -p {{.CERT_DIR}}
+      - mkcert -cert-file {{.CERT_DIR}}/{{.CERT_DOMAIN}}+1.pem -key-file {{.CERT_DIR}}/{{.CERT_DOMAIN}}+1-key.pem "*.{{.CERT_DOMAIN}}" "{{.CERT_DOMAIN}}"
+
+  logs:
+    desc: 'Afficher les logs (usage: task logs -- api)'
+    cmds:
+      - docker compose logs -f {{.CLI_ARGS}}
+
+  clean:
+    desc: Tout supprimer (containers, volumes, certificats)
+    cmds:
+      - docker compose down -v
+      - rm -rf {{.CERT_DIR}}/*.pem
+
+  rebuild:
+    desc: Reconstruire les containers (après changement de deps)
+    cmds:
+      - docker compose up --build -d
+
+  lint:type-check:
+    desc: Runs the tsc analysis
+    cmds:
+      - $DC_RUN api pnpm --filter @archie/api --filter @archie/shared type-check
+      - $DC_RUN api pnpm --filter @archie/web type-check
+
+  lint:eslint:
+    desc: Runs the eslint analysis
+    cmds:
+      - $DC_RUN api pnpm --filter @archie/api --filter @archie/shared lint
+      - $DC_RUN web pnpm --filter @archie/web lint
+
+  lint:depcruise:
+    desc: Runs the depcruise analysis
+    cmds:
+      - $DC_RUN api pnpm depcruise
+
+  test:unit:
+    desc: Lancer les tests unitaires en Docker
+    cmds:
+      - $DC_RUN api pnpm --filter @archie/api --filter @archie/shared test
+      - $DC_RUN web pnpm --filter @archie/web test
+
+  avengers:
+    desc: Lancer toutes les suites de tests les unes après les autres
+    cmds:
+      - task: lint:type-check
+      - task: lint:eslint
+      - task: lint:depcruise
+      - task: test:unit

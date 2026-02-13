@@ -1,0 +1,94 @@
+services:
+  traefik:
+    image: traefik:v3.6
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --entrypoints.websecure.address=:443
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.app.localhost`)
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.service=api@internal
+    ports:
+      - '443:443'
+      - '80:80'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - ./.certs:/etc/traefik/certs:ro
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: web
+    env_file:
+      - .env
+      - .env.local
+    volumes:
+      - .:/app
+      - pnpm_store:/pnpm
+      - root_node_modules:/app/node_modules
+      - web_node_modules:/app/apps/web/node_modules
+      - shared_node_modules:/app/packages/shared/node_modules
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.web.rule=Host(`web.app.localhost`)
+      - traefik.http.routers.web.entrypoints=websecure
+      - traefik.http.routers.web.tls=true
+      - traefik.http.services.web.loadbalancer.server.port=5173
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: api
+    env_file:
+      - .env
+      - .env.local
+    volumes:
+      - .:/app
+      - pnpm_store:/pnpm
+      - root_node_modules:/app/node_modules
+      - api_node_modules:/app/apps/api/node_modules
+      - shared_node_modules:/app/packages/shared/node_modules
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=Host(`api.app.localhost`)
+      - traefik.http.routers.api.entrypoints=websecure
+      - traefik.http.routers.api.tls=true
+      - traefik.http.services.api.loadbalancer.server.port=3000
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: archie_dev
+      POSTGRES_USER: archie
+      POSTGRES_PASSWORD: archie_dev_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+
+volumes:
+  pgdata:
+  pnpm_store:
+  root_node_modules:
+  web_node_modules:
+  api_node_modules:
+  shared_node_modules:

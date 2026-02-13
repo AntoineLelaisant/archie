@@ -1,0 +1,11 @@
+node_modules
+.pnpm-store
+dist
+.svelte-kit
+.turbo
+coverage
+$houdini
+.git
+.certs
+_bmad-output
+.claude

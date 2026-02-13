@@ -1,4 +1,37 @@
 _bmad/
 .DS_Store
 .claude/worktrees
-.turbo/cache
+
+# Dependencies
+node_modules/
+.pnpm-store
+
+# Build outputs
+dist/
+.svelte-kit/
+.turbo/
+
+# Environment
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Test
+coverage/
+
+# Houdini
+$houdini/
+
+# TLS certificates (mkcert)
+.certs/*.pem
+
+# Task
+.task/

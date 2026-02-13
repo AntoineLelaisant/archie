@@ -1,0 +1,21 @@
+{
+  "name": "@archie/shared",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "lint": "echo 'lint handled at root level'",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.1"
+  }
+}
